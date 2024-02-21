@@ -1,2 +1,2 @@
 # install all dependencies
-renv::install()
+renv::install(prompt = FALSE)
