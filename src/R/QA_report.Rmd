@@ -926,7 +926,7 @@ first_colnames <- colnames(data_sheet_fake)[1:8]
 as_is_colnames <- colnames(data_sheet_6)
 
 as_is_colnames[1:8] <- first_colnames
-colnames(data_sheet_6)[1:15] <- c(
+colnames(data_sheet_6)[1:14] <- c(
   first_colnames[1:4],
   'POB1', 'POB5', 'POB15',
   lang_label("immunity_populations_and_pfa"),
@@ -958,6 +958,9 @@ colnames(data_sheet_6) <- c(
   lang_label("outbreaks_yellow_feverr"),
   lang_label("outbreaks_tetanus")
 )
+
+dat_test_na_df6 <- get_test_na_df(data_sheet_6)
+
 data_sheet_6$`ADMIN1 GEO_ID` <- as.character(data_sheet_6$`ADMIN1 GEO_ID`)
 data_sheet_6$GEO_ID <- as.character(data_sheet_6$GEO_ID)
 
