@@ -212,7 +212,7 @@ cat_na_table(na_rows_df,in_cols=NULL)
 
 ### 1. `r lang_label("title_cdata_general")`
 ```{r rev_data_1, echo=F}
-data_sheet_1 <- read_excel(PATH_country_data,sheet = 1)
+data_sheet_1 <- read_excel(PATH_country_data, sheet = 1)
 colnames(data_sheet_1) <- c("VAR","VAL")
 
 dat_test_na_val <- sum(is.na(data_sheet_1$VAL)) == 0
@@ -252,7 +252,12 @@ if (ERROR_LIST == "") {
 \newpage
 ### 2. `r lang_label("title_cdata_pob_area")`
 ```{r rev_data_2, echo=F}
-data_sheet_2 <- read_excel(PATH_country_data,sheet = 2)
+data_sheet_2 <- read_excel(
+  PATH_country_data, sheet = 2, col_types = c(
+    "guess", "guess", "guess", "guess",
+    "numeric", "numeric", "numeric", "numeric"
+  )
+)
 row_offset <- 1
 as_is_colnames <- colnames(data_sheet_2)
 dat_test_na_df2 <- get_test_na_df(data_sheet_2)
@@ -366,7 +371,13 @@ YEAR_3 = YEAR_EVAL - 3
 YEAR_4 = YEAR_EVAL - 2
 YEAR_5 = YEAR_EVAL - 1
 
-data_sheet_3 <- read_excel(PATH_country_data,sheet = 3)
+data_sheet_3 <- read_excel(
+  PATH_country_data, sheet = 3, col_types = c(
+    "guess", "guess", "guess", "guess", "numeric", "numeric", "numeric",
+    "text", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric",
+    "text"
+  )
+)
 as_is_colnames <- colnames(data_sheet_3)
 as_is_colnames[9:13] <- c(
   paste(lang_label("immunity_polio_coverage"), YEAR_1),
@@ -527,7 +538,13 @@ knitr::kable(test_table, booktabs = T)
 ### 4. `r lang_label("title_surveillance")`
 
 ```{r rev_data_4, echo=F}
-data_sheet_4 <- read_excel(PATH_country_data,sheet = 4, skip= 1, guess_max = 1000)
+data_sheet_4 <- read_excel(
+  PATH_country_data,sheet = 4, skip= 1, guess_max = 1000, col_types = c(
+    "guess", "guess", "guess", "guess", "numeric", "numeric", "numeric",
+    "text", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric",
+    "text"
+  )
+)
 data_sheet_fake <- read_excel(PATH_country_data,sheet = 4, guess_max = 1000)
 first_colnames <- colnames(data_sheet_fake)[1:8]
 as_is_colnames <- colnames(data_sheet_4)
@@ -559,7 +576,7 @@ dat_test_na_df4 <- data_sheet_4 %>%
       !population_and_pfa_bool ~ 0
     ),
     `%  de casos de PFA con notificación oportuna (antes de 14 días desde el inicio de la parálisis)` = case_when(
-      population_and_pfa_bool ~ `Tasa PFA`,
+      population_and_pfa_bool ~ `%  de casos de PFA con notificación oportuna (antes de 14 días desde el inicio de la parálisis)`,
       !population_and_pfa_bool ~ 0
     ),
     `% de casos de PFA investigados en menos de 48 horas` = case_when(
@@ -807,7 +824,12 @@ knitr::kable(test_table, booktabs = T)
 ### 5. `r lang_label("title_determinants")`
 
 ```{r rev_data_5, echo=F}
-data_sheet_5 <- read_excel(PATH_country_data,sheet = 5, skip= 1, guess_max = 1000)
+data_sheet_5 <- read_excel(
+  PATH_country_data,sheet = 5, skip= 1, guess_max = 1000, col_types = c(
+    "guess", "guess", "guess", "guess", "numeric", "numeric", "numeric",
+    "text", "numeric", "numeric"
+  )
+)
 data_sheet_fake <- read_excel(PATH_country_data,sheet = 5, guess_max = 1000)
 first_colnames <- colnames(data_sheet_fake)[1:8]
 as_is_colnames <- colnames(data_sheet_5)
@@ -920,7 +942,12 @@ knitr::kable(test_table, booktabs = T)
 ### 6. `r lang_label("title_outbreaks")`
 
 ```{r rev_data_6, echo=F}
-data_sheet_6 <- read_excel(PATH_country_data,sheet = 6, skip = 1, guess_max = 1000)
+data_sheet_6 <- read_excel(
+  PATH_country_data,sheet = 6, skip = 1, guess_max = 1000, col_types = c(
+    "guess", "guess", "guess", "guess", "numeric", "numeric", "numeric",
+    "text", "text", "text", "text", "text", "text", "text"
+  )
+)
 data_sheet_fake <- read_excel(PATH_country_data,sheet = 6, guess_max = 1000)
 first_colnames <- colnames(data_sheet_fake)[1:8]
 as_is_colnames <- colnames(data_sheet_6)

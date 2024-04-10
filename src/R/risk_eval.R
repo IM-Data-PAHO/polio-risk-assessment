@@ -350,7 +350,13 @@ ZERO_POB_LIST <- ZERO_POB_LIST$GEO_ID
 # POPULATION IMMUNITY ----
 
 ## Read data ----
-immunity_data <- read_excel(PATH_country_data, sheet = 3, skip = 2, col_names = FALSE)
+immunity_data <- read_excel(
+  PATH_country_data, sheet = 3, skip = 2, col_names = FALSE, col_types = c(
+    "guess", "guess", "guess", "guess", "numeric", "numeric", "numeric",
+    "text", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric",
+    "text"
+  )
+)
 colnames(immunity_data) <- c('ADMIN1 GEO_ID', 'GEO_ID', 'ADMIN1', 'ADMIN2', 
                             'POB1', 'POB5', 'POB15', 'pfa','year1','year2','year3',
                             'year4','year5','ipv2','effective_campaign')
@@ -402,7 +408,13 @@ scores_data <- left_join(scores_data, immunity_scores_join)
 # SURVAILLANCE ----
 
 ## Read data ----
-surveillance_data <- read_excel(PATH_country_data, sheet = 4, skip = 2, col_names = FALSE)
+surveillance_data <- read_excel(
+  PATH_country_data, sheet = 4, skip = 2, col_names = FALSE, col_types = c(
+    "guess", "guess", "guess", "guess", "numeric", "numeric", "numeric",
+    "text", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric",
+    "text"
+  )
+)
 colnames(surveillance_data) <- c('ADMIN1 GEO_ID', 'GEO_ID', 'ADMIN1', 'ADMIN2', 
                                  'POB1', 'POB5', 'POB15', 'pfa', 'compliant_units_percent', 'pfa_rate', 
                            'pfa_notified_percent', 'pfa_investigated_percent', 
@@ -448,7 +460,12 @@ scores_data <- left_join(scores_data, surveillance_scores_join)
 # DETERMINANTS ----
 
 ## Read data ----
-determinants_data <- read_excel(PATH_country_data, sheet = 5, skip = 2, col_names = FALSE)
+determinants_data <- read_excel(
+  PATH_country_data, sheet = 5, skip = 2, col_names = FALSE, col_types = c(
+    "guess", "guess", "guess", "guess", "numeric", "numeric", "numeric",
+    "text", "numeric", "numeric"
+  )
+)
 colnames(determinants_data) <- c('ADMIN1 GEO_ID', 'GEO_ID', 'ADMIN1', 'ADMIN2', 
                                  'POB1', 'POB5', 'POB15', 'pfa', 'drinking_water_percent', 'sanitation_services_percent')
 determinants_data <- admin_normalizer(determinants_data)
@@ -488,7 +505,12 @@ scores_data <- left_join(scores_data, determinants_scores_join)
 # OUTBREAKS ----
 
 ## Read data ----
-outbreaks_data = read_excel(PATH_country_data, sheet = 6, skip = 2, col_names = FALSE)
+outbreaks_data = read_excel(
+  PATH_country_data, sheet = 6, skip = 2, col_names = FALSE, col_types = c(
+    "guess", "guess", "guess", "guess", "numeric", "numeric", "numeric",
+    "text", "text", "text", "text", "text", "text", "text"
+  )
+)
 colnames(outbreaks_data) =  c('ADMIN1 GEO_ID', 'GEO_ID', 'ADMIN1', 'ADMIN2',
                               'POB1', 'POB5', 'POB15', 'pfa',
                               'polio', 'measles', 'rubella', 'diphtheria', 'yellow_fever', 'tetanus')
