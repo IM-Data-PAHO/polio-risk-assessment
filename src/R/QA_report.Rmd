@@ -473,7 +473,7 @@ knitr::kable(test_table, booktabs = T)
 idx <- c(10:14)
 
 test_data_sheet_3 <- read_excel(
-  PATH_country_data, sheet = 3
+  PATH_country_data, sheet = 3, skip = 1
 )
 colnames(test_data_sheet_3) <- c(
   "ADMIN1 GEO_ID","GEO_ID","ADMIN1","ADMIN2",
@@ -499,7 +499,7 @@ for (col in idx) {
 non_numeric_rows <- sort(unique(non_numeric_rows))+row_offset
 
 idx <- c(1,2,3,idx)
-test_table <- data_sheet_3[,idx]
+test_table <- test_data_sheet_3[,idx]
 colnames(test_table)[1] = "FILA"
 test_table <- test_table %>% filter(FILA %in% non_numeric_rows)
 if (nrow(test_table) == 0) {
@@ -542,7 +542,7 @@ for (col in idx) {
 non_numeric_rows <- sort(unique(non_numeric_rows))+row_offset
 
 idx <- c(1,2,3,idx)
-test_table <- data_sheet_3[,idx]
+test_table <- test_data_sheet_3[,idx]
 colnames(test_table)[1] = "FILA"
 test_table <- test_table %>% filter(FILA %in% non_numeric_rows)
 if (nrow(test_table) == 0) {
@@ -675,7 +675,24 @@ knitr::kable(dat_test_na_df4,align = "lrrrrrr", booktabs = T)
 #### `r lang_label("no_na_nonnum_data")` (`r lang_label("surveillance_reporting_units_var")`)
 ```{r, echo=F}
 idx <- c(10)
-temp_data_sheet_4 <- data_sheet_4
+test_data_sheet_4 <- read_excel(
+  PATH_country_data,sheet = 4, skip= 1, guess_max = 1000
+)
+colnames(test_data_sheet_4) <- c(
+  "ADMIN1 GEO_ID","GEO_ID","ADMIN1","ADMIN2",
+  'POB1', 'POB5', 'POB15',
+  lang_label("immunity_populations_and_pfa"),
+  lang_label("surveillance_reporting_units_var"),
+  lang_label("surveillance_pfa_rate_var"),
+  lang_label("surveillance_pfa_notified_var"),
+  lang_label("surveillance_pfa_investigated_var"),
+  lang_label("surveillance_suitable_samples_var"),
+  lang_label("surveillance_followups_var"),
+  lang_label("surveillance_active_search_var")
+)
+test_data_sheet_4$FILA <- as.numeric(rownames(test_data_sheet_4))+row_offset
+test_data_sheet_4 <- test_data_sheet_4 %>% select(FILA, everything())
+temp_data_sheet_4 <- test_data_sheet_4
 temp_data_sheet_4[, idx] <- lapply(temp_data_sheet_4[, idx], as.numeric)
 
 non_numeric_rows = c()
@@ -685,7 +702,7 @@ for (col in idx) {
 non_numeric_rows <- sort(unique(non_numeric_rows))+row_offset
 
 idx <- c(1,2,3,idx)
-test_table <- data_sheet_4[,idx]
+test_table <- test_data_sheet_4[,idx]
 colnames(test_table)[1] = "FILA"
 test_table <- test_table %>% filter(FILA %in% non_numeric_rows)
 if (nrow(test_table) == 0) {
@@ -702,7 +719,24 @@ knitr::kable(test_table, booktabs = T)
 #### `r lang_label("no_na_nonnum_data")` (`r lang_label("surveillance_pfa_rate_var")`)
 ```{r, echo=F}
 idx <- c(11)
-temp_data_sheet_4 <- data_sheet_4
+test_data_sheet_4 <- read_excel(
+  PATH_country_data,sheet = 4, skip= 1, guess_max = 1000
+)
+colnames(test_data_sheet_4) <- c(
+  "ADMIN1 GEO_ID","GEO_ID","ADMIN1","ADMIN2",
+  'POB1', 'POB5', 'POB15',
+  lang_label("immunity_populations_and_pfa"),
+  lang_label("surveillance_reporting_units_var"),
+  lang_label("surveillance_pfa_rate_var"),
+  lang_label("surveillance_pfa_notified_var"),
+  lang_label("surveillance_pfa_investigated_var"),
+  lang_label("surveillance_suitable_samples_var"),
+  lang_label("surveillance_followups_var"),
+  lang_label("surveillance_active_search_var")
+)
+test_data_sheet_4$FILA <- as.numeric(rownames(test_data_sheet_4))+row_offset
+test_data_sheet_4 <- test_data_sheet_4 %>% select(FILA, everything())
+temp_data_sheet_4 <- test_data_sheet_4
 temp_data_sheet_4[, idx] <- lapply(temp_data_sheet_4[, idx], as.numeric)
 
 non_numeric_rows = c()
@@ -714,7 +748,7 @@ non_numeric_rows <- non_numeric_rows[!non_numeric_rows %in% which(!population_an
 non_numeric_rows <- sort(unique(non_numeric_rows))+row_offset
 
 idx <- c(1,2,3,idx)
-test_table <- data_sheet_4[,idx]
+test_table <- test_data_sheet_4[,idx]
 colnames(test_table)[1] = "FILA"
 test_table <- test_table %>% filter(FILA %in% non_numeric_rows)
 if (nrow(test_table) == 0) {
@@ -777,7 +811,24 @@ knitr::kable(test_table, booktabs = T)
 #### `r lang_label("no_na_nonnum_data")` (`r lang_label("surveillance_pfa_investigated_var")`)
 ```{r, echo=F}
 idx <- c(13)
-temp_data_sheet_4 <- data_sheet_4
+test_data_sheet_4 <- read_excel(
+  PATH_country_data,sheet = 4, skip= 1, guess_max = 1000
+)
+colnames(test_data_sheet_4) <- c(
+  "ADMIN1 GEO_ID","GEO_ID","ADMIN1","ADMIN2",
+  'POB1', 'POB5', 'POB15',
+  lang_label("immunity_populations_and_pfa"),
+  lang_label("surveillance_reporting_units_var"),
+  lang_label("surveillance_pfa_rate_var"),
+  lang_label("surveillance_pfa_notified_var"),
+  lang_label("surveillance_pfa_investigated_var"),
+  lang_label("surveillance_suitable_samples_var"),
+  lang_label("surveillance_followups_var"),
+  lang_label("surveillance_active_search_var")
+)
+test_data_sheet_4$FILA <- as.numeric(rownames(test_data_sheet_4))+row_offset
+test_data_sheet_4 <- test_data_sheet_4 %>% select(FILA, everything())
+temp_data_sheet_4 <- test_data_sheet_4
 temp_data_sheet_4[, idx] <- lapply(temp_data_sheet_4[, idx], as.numeric)
 
 non_numeric_rows = c()
@@ -789,7 +840,7 @@ non_numeric_rows <- non_numeric_rows[!non_numeric_rows %in% which(!population_an
 non_numeric_rows <- sort(unique(non_numeric_rows))+row_offset
 
 idx <- c(1,2,3,idx)
-test_table <- data_sheet_4[,idx]
+test_table <- test_data_sheet_4[,idx]
 colnames(test_table)[1] = "FILA"
 test_table <- test_table %>% filter(FILA %in% non_numeric_rows)
 if (nrow(test_table) == 0) {
@@ -806,7 +857,24 @@ knitr::kable(test_table, booktabs = T)
 #### `r lang_label("no_na_nonnum_data")` (`r lang_label("surveillance_suitable_samples_var")`)
 ```{r, echo=F}
 idx <- c(14)
-temp_data_sheet_4 <- data_sheet_4
+test_data_sheet_4 <- read_excel(
+  PATH_country_data,sheet = 4, skip= 1, guess_max = 1000
+)
+colnames(test_data_sheet_4) <- c(
+  "ADMIN1 GEO_ID","GEO_ID","ADMIN1","ADMIN2",
+  'POB1', 'POB5', 'POB15',
+  lang_label("immunity_populations_and_pfa"),
+  lang_label("surveillance_reporting_units_var"),
+  lang_label("surveillance_pfa_rate_var"),
+  lang_label("surveillance_pfa_notified_var"),
+  lang_label("surveillance_pfa_investigated_var"),
+  lang_label("surveillance_suitable_samples_var"),
+  lang_label("surveillance_followups_var"),
+  lang_label("surveillance_active_search_var")
+)
+test_data_sheet_4$FILA <- as.numeric(rownames(test_data_sheet_4))+row_offset
+test_data_sheet_4 <- test_data_sheet_4 %>% select(FILA, everything())
+temp_data_sheet_4 <- test_data_sheet_4
 temp_data_sheet_4[, idx] <- lapply(temp_data_sheet_4[, idx], as.numeric)
 
 non_numeric_rows = c()
@@ -818,7 +886,7 @@ non_numeric_rows <- non_numeric_rows[!non_numeric_rows %in% which(!population_an
 non_numeric_rows <- sort(unique(non_numeric_rows))+row_offset
 
 idx <- c(1,2,3,idx)
-test_table <- data_sheet_4[,idx]
+test_table <- test_data_sheet_4[,idx]
 colnames(test_table)[1] = "FILA"
 test_table <- test_table %>% filter(FILA %in% non_numeric_rows)
 if (nrow(test_table) == 0) {
@@ -834,7 +902,7 @@ knitr::kable(test_table, booktabs = T)
 #### `r lang_label("no_na_nonnum_data")` (`r lang_label("surveillance_followups_var")`)
 ```{r, echo=F}
 idx <- c(15)
-temp_data_sheet_4 <- data_sheet_4
+temp_data_sheet_4 <- test_data_sheet_4
 temp_data_sheet_4[, idx] <- lapply(temp_data_sheet_4[, idx], as.numeric)
 
 non_numeric_rows = c()
@@ -846,7 +914,7 @@ non_numeric_rows <- non_numeric_rows[!non_numeric_rows %in% which(!population_an
 non_numeric_rows <- sort(unique(non_numeric_rows))+row_offset
 
 idx <- c(1,2,3,idx)
-test_table <- data_sheet_4[,idx]
+test_table <- test_data_sheet_4[,idx]
 colnames(test_table)[1] = "FILA"
 test_table <- test_table %>% filter(FILA %in% non_numeric_rows)
 if (nrow(test_table) == 0) {
@@ -940,7 +1008,19 @@ knitr::kable(dat_test_na_df5,align = "lrrrrrr", booktabs = T)
 #### `r lang_label("no_na_nonnum_data")` (`r lang_label("determinants_water_var")`)
 ```{r, echo=F}
 idx <- c(10)
-temp_data_sheet_5 <- data_sheet_5
+test_data_sheet_5 <- read_excel(
+  PATH_country_data,sheet = 5, skip= 1, guess_max = 1000
+)
+colnames(test_data_sheet_5)[1:15] <- c(
+  first_colnames[1:4],
+  'POB1', 'POB5', 'POB15',
+  lang_label("immunity_populations_and_pfa"),
+  lang_label("determinants_water_var"),
+  lang_label("determinants_sanitation_var")
+)
+test_data_sheet_5$FILA <- as.numeric(rownames(test_data_sheet_5))+row_offset
+test_data_sheet_5 <- test_data_sheet_5 %>% select(FILA,everything())
+temp_data_sheet_5 <- test_data_sheet_5
 temp_data_sheet_5[, idx] <- lapply(temp_data_sheet_5[, idx], as.numeric)
 
 non_numeric_rows = c()
@@ -950,7 +1030,7 @@ for (col in idx) {
 non_numeric_rows <- sort(unique(non_numeric_rows))+row_offset
 
 idx <- c(1,2,3,idx)
-test_table <- data_sheet_5[,idx]
+test_table <- test_data_sheet_5[,idx]
 colnames(test_table)[1] = "FILA"
 test_table <- test_table %>% filter(FILA %in% non_numeric_rows)
 if (nrow(test_table) == 0) {
@@ -966,7 +1046,19 @@ knitr::kable(test_table, booktabs = T)
 #### `r lang_label("no_na_nonnum_data")` (`r lang_label("determinants_sanitation_var")`)
 ```{r, echo=F}
 idx <- c(11)
-temp_data_sheet_5 <- data_sheet_5
+test_data_sheet_5 <- read_excel(
+  PATH_country_data,sheet = 5, skip= 1, guess_max = 1000
+)
+colnames(test_data_sheet_5)[1:15] <- c(
+  first_colnames[1:4],
+  'POB1', 'POB5', 'POB15',
+  lang_label("immunity_populations_and_pfa"),
+  lang_label("determinants_water_var"),
+  lang_label("determinants_sanitation_var")
+)
+test_data_sheet_5$FILA <- as.numeric(rownames(test_data_sheet_5))+row_offset
+test_data_sheet_5 <- test_data_sheet_5 %>% select(FILA,everything())
+temp_data_sheet_5 <- test_data_sheet_5
 temp_data_sheet_5[, idx] <- lapply(temp_data_sheet_5[, idx], as.numeric)
 
 non_numeric_rows = c()
