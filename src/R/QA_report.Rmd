@@ -219,7 +219,7 @@ dat_test_na_val <- sum(is.na(data_sheet_1$VAL)) == 0
 dat_test_int_yeareval <- !is.na(as.integer(data_sheet_1$VAL[2]))
 dat_test_language <- data_sheet_1$VAL[3] %in% c("SPA","ENG","FRA","POR")
 dat_test_int_total_admin2 <- !is.na(as.integer(data_sheet_1$VAL[4]))
-dat_test_int_polio <- !is.na(as.integer(data_sheet_1$VAL[5]))
+dat_test_int_polio <- !is.na(data_sheet_1$VAL[5])
 
 
 ERROR_LIST <- ""
@@ -236,7 +236,7 @@ if (!dat_test_int_total_admin2) {
   ERROR_LIST <- paste0(ERROR_LIST,"- ",lang_label("cdata_error_non_numeric")," *'",data_sheet_1$VAR[4],"'*.\n")
 }
 if (!dat_test_int_polio) {
-  ERROR_LIST <- paste0(ERROR_LIST,"- ",lang_label("cdata_error_non_numeric")," *'",data_sheet_1$VAR[5],"'*.\n")
+  ERROR_LIST <- paste0(ERROR_LIST,"- ",lang_label("cdata_test_na_val")," *'",data_sheet_1$VAR[5],"'*.\n")
 }
 if (ERROR_LIST == "") {
   ERROR_LIST = paste0("- ",lang_label("test_error_none"),".")
