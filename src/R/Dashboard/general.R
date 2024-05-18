@@ -4,7 +4,13 @@
 # Author: Oliver Mazariegos & Luis Quezada
 # Last Update: 2023-10-09
 # R 4.3.1
-
+# Editorial ----
+# Editor: Rafael León
+# Contact: leonraf@paho.org
+# Date: 2024-05-17
+# Edit: Modified general to consider other languages, previously the tool
+# was not considering even the correct cell to change language.
+# Edit 2: removed coloring of individual cells to increase performance on DT
 
 # Utils ----
 cFormat <- function(x,n) {
@@ -188,16 +194,16 @@ ind_prep_bar_data <- function(LANG_TLS,CUT_OFFS,data,indicator,admin1_id,risk, p
   
   prep_data <- data %>%
     rename("PR" = var_to_summarise) 
-    
-
-
+  
+  
+  
   if (admin1_id == 0) {
     prep_data <- prep_data %>% filter(!is.na(PR)) %>% select(ADMIN2,PR, pfa)
   } else {
     prep_data <- prep_data %>% filter(`ADMIN1 GEO_ID` == admin1_id) %>% filter(!is.na(PR)) %>% select(ADMIN2,PR, pfa)
   }
   
-
+  
   
   prep_data$risk_level <- get_risk_level(LANG_TLS,CUT_OFFS,indicator,prep_data$PR, pfa = data$pfa)
   if (risk != "ALL") {
@@ -381,38 +387,39 @@ ind_get_bar_table <- function(LANG_TLS,CUT_OFFS,data,indicator,admin1_id,risk, p
       lang_label_tls(LANG_TLS,"risk_points"),
       backgroundColor = "#e3e3e3"
     )
-  
-  if (indicator == "total_score") {
-    datos_table <- datos_table %>% 
-      formatStyle(
-        lang_label_tls(LANG_TLS,"menuitem_immunity"),
-        backgroundColor = styleRow(
-          indicators_risk$row_id,
-          indicators_risk$immunity_score_color
-        )
-      ) %>% 
-      formatStyle(
-        lang_label_tls(LANG_TLS,"menuitem_surveillance"),
-        backgroundColor = styleRow(
-          indicators_risk$row_id,
-          indicators_risk$surveillance_score_color
-        )
-      ) %>% 
-      formatStyle(
-        lang_label_tls(LANG_TLS,"menuitem_determinants"),
-        backgroundColor = styleRow(
-          indicators_risk$row_id,
-          indicators_risk$determinants_score_color
-        )
-      ) %>% 
-      formatStyle(
-        lang_label_tls(LANG_TLS,"menuitem_outbreaks"),
-        backgroundColor = styleRow(
-          indicators_risk$row_id,
-          indicators_risk$outbreaks_score_color
-        )
-      )
-  }
+  ## 2024-05-17 Major fix ----
+  # removed this functionality as it was a major performance decrease
+  # if (indicator == "total_score") {
+  #   datos_table <- datos_table %>% 
+  #     formatStyle(
+  #       lang_label_tls(LANG_TLS,"menuitem_immunity"),
+  #       backgroundColor = styleRow(
+  #         indicators_risk$row_id,
+  #         indicators_risk$immunity_score_color
+  #       )
+  #     ) %>% 
+  #     formatStyle(
+  #       lang_label_tls(LANG_TLS,"menuitem_surveillance"),
+  #       backgroundColor = styleRow(
+  #         indicators_risk$row_id,
+  #         indicators_risk$surveillance_score_color
+  #       )
+  #     ) %>% 
+  #     formatStyle(
+  #       lang_label_tls(LANG_TLS,"menuitem_determinants"),
+  #       backgroundColor = styleRow(
+  #         indicators_risk$row_id,
+  #         indicators_risk$determinants_score_color
+  #       )
+  #     ) %>% 
+  #     formatStyle(
+  #       lang_label_tls(LANG_TLS,"menuitem_outbreaks"),
+  #       backgroundColor = styleRow(
+  #         indicators_risk$row_id,
+  #         indicators_risk$outbreaks_score_color
+  #       )
+  #     )
+  # }
   
   return(datos_table)
 }
@@ -424,7 +431,7 @@ ind_plot_bar_data <- function(LANG_TLS,CUT_OFFS,bar_data,indicator,admin1_id, pf
     filter(
       pfa == pfa_filter
     )
-
+  
   if (admin1_id != 0) {
     y_axis_title <- str_to_title(lang_label_tls(LANG_TLS,"rep_label_admin2_name_plural"))
     x_axis_title <- paste0(lang_label_tls(LANG_TLS,"risk_points")," (",lang_label_tls(LANG_TLS,indicator),")")
@@ -487,7 +494,7 @@ ind_plot_multibar_data <- function(LANG_TLS,CUT_OFFS,bar_data,admin1_id,selected
       bar_data <- bar_data %>% filter(POB15 >= 100000)
     }
   }
-
+  
   if (admin1_id != 0) {
     
     if (selected_indicador == "total_score") {
@@ -495,13 +502,13 @@ ind_plot_multibar_data <- function(LANG_TLS,CUT_OFFS,bar_data,admin1_id,selected
       if (risk != "ALL") {
         bar_data <- bar_data %>% filter(risk_level == lang_label_tls(LANG_TLS,risk))
       }
-
+      
       fig <- plot_ly(bar_data, type = 'bar',orientation = 'h',y = ~LUGAR,
                      x = ~immunity_score, name = lang_label_tls(LANG_TLS,"menuitem_immunity"),marker = list(color = "#8DB1CC"),text = ~immunity_score, textposition = 'inside',textangle = 0) %>%
         add_trace(x = ~surveillance_score, name = lang_label_tls(LANG_TLS,"menuitem_surveillance"), marker = list(color = "#2165A4"),text = ~surveillance_score, textposition = 'inside') %>%
         add_trace(x = ~determinants_score, name = lang_label_tls(LANG_TLS,"menuitem_determinants"), marker = list(color = "#253E80"),text = ~determinants_score, textposition = 'inside') %>%
         add_trace(x = ~outbreaks_score, name = lang_label_tls(LANG_TLS,"menuitem_outbreaks"), marker = list(color = "#6436A5"),text = ~outbreaks_score, textposition = 'inside') %>% 
-
+        
         layout(xaxis = list(title = x_axis_title, tickfont = list(size = 12)), 
                barmode = 'stack',
                yaxis = list(title = y_axis_title, tickangle = 0, tickfont = list(size = 10))
@@ -605,7 +612,7 @@ ind_plot_map_data <- function(LANG_TLS,ZERO_POB_LIST,CUT_OFFS,map_data,indicator
     get_risk_level_point_limit(CUT_OFFS,indicator,"HR", pfa),
     get_risk_level_point_limit(CUT_OFFS,indicator,"VHR", pfa)
   )
-
+  
   map_data <- map_data %>% mutate(
     risk_level_num = case_when(
       is.na(risk_level) ~ 0,
@@ -621,7 +628,7 @@ ind_plot_map_data <- function(LANG_TLS,ZERO_POB_LIST,CUT_OFFS,map_data,indicator
       T ~ risk_level
     )
   )
-
+  
   pal_gradient <- colorNumeric(
     c("#666666","#92d050","#fec000","#e8132b","#920000","#9bc2e6"),
     domain = c(0,5)
@@ -667,7 +674,7 @@ ind_plot_map_data <- function(LANG_TLS,ZERO_POB_LIST,CUT_OFFS,map_data,indicator
   }
   
   map_data <- st_as_sf(map_data)
-
+  
   shape_label <- sprintf("<strong>%s</strong>, %s<br/>%s: %s<br/>%s: %s",
                          map_data$ADMIN2,
                          map_data$ADMIN1,
@@ -748,7 +755,7 @@ ind_prep_box_data <- function(LANG_TLS,CUT_OFFS,data,indicator,admin1_id,pop_fil
       prep_data <- prep_data %>% filter(POB15 >= 100000)
     }
   }
-
+  
   
   return(prep_data)
 }

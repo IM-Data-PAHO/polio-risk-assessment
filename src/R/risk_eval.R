@@ -4,18 +4,14 @@
 # Author: Oliver Mazariegos
 # Last Update: 2023-10-09
 # R 4.3.1
-
-# SETUP ----
-
-Sys.setlocale(locale = "es_ES.UTF-8")
-
-
-library(readxl)
-library(sf)
-library(tidyverse)
+# Editorial ----
+# Editor: Rafael León
+# Contact: leonraf@paho.org
+# Date: 2024-05-17
+# Edit: Modified RISK eval to consider other languages, previously the tool
+# was not considering even the correct cell to change language
 
 rm(list = ls())
-
 # PATHS ----
 file_path = rstudioapi::getSourceEditorContext()$path
 file_path_index = unlist(gregexec('R/risk_eval.R',file_path))[1]
@@ -24,6 +20,34 @@ PATH_country_data   = paste0(PATH_global,"Data/country_data.xlsx")
 PATH_risk_cut_offs  = paste0(PATH_global,"R/risk_cut_offs.xlsx")
 PATH_shapefiles     = paste0(PATH_global,"Data/shapefiles/")
 PATH_translations   = paste0(PATH_global,"R/translations.xlsx")
+
+# SETUP ----
+## 2024-05-17 Major fix ----
+LANG <- as.character(read_excel(PATH_country_data,sheet = 1)[3,2])
+
+if(LANG == "SPA"){
+  Sys.setlocale(locale = "es_ES.UTF-8")
+}
+
+if(LANG == "POR"){
+  Sys.setlocale(locale = "es_ES.UTF-8")
+}
+
+if(LANG == "ENG"){
+  Sys.setlocale(locale = "en_US.UTF-8")
+}
+
+if(LANG == "FRA"){
+  Sys.setlocale(locale = "fr_FR.UTF-8")
+}
+
+library(readxl)
+library(sf)
+library(tidyverse)
+
+
+
+
 
 # VARS ----
 LANG <- as.character(read_excel(PATH_country_data,sheet = 1)[3,2])
@@ -110,11 +134,11 @@ geocodes_cleansing <- function(df) {
 
 # Population and PFA
 population_and_pfa <- function(population_inmunity_df) {
-    score <- case_when(
-      population_inmunity_df$POB15 >= 100000 | population_inmunity_df$pfa == lang_label("yes") ~ TRUE,
-      TRUE ~ FALSE
-    )
-    return(score)
+  score <- case_when(
+    population_inmunity_df$POB15 >= 100000 | population_inmunity_df$pfa == lang_label("yes") ~ TRUE,
+    TRUE ~ FALSE
+  )
+  return(score)
 }
 
 # Score coverage Polio3
@@ -162,7 +186,7 @@ score_effective_campaign <- function(population_inmunity_df) {
     !population_and_pfa & population_inmunity_df[["effective_campaign"]] == lang_label("no") ~ 8,
     !population_and_pfa & population_inmunity_df[["effective_campaign"]] == lang_label("yes") ~ 0,
     TRUE ~ 0
-   )
+  )
   return(score)
 }
 
@@ -300,12 +324,14 @@ score_outbreak <- function(outbreaks_df, disease) {
 
 
 # OPTS ----
+## 2024-05-17 Major fix ----
+# This section was not referencing the language sheet correctly
 OPTS_DF <- read_xlsx(PATH_country_data,sheet = "_ListValues")
 sex_opts <- unique(OPTS_DF$Sex)
 sex_opts <- sex_opts[!is.na(sex_opts)]
-yes_no_opts <- unique(OPTS_DF$`Yes No`)
+yes_no_opts <- unique(OPTS_DF[2])
 yes_no_opts <- yes_no_opts[!is.na(yes_no_opts)]
-outbreak_opts <- unique(OPTS_DF$Outbreaks)
+outbreak_opts <- unique(OPTS_DF[3])
 outbreak_opts <- outbreak_opts[!is.na(outbreak_opts)]
 
 # GENERAL ----
@@ -350,16 +376,10 @@ ZERO_POB_LIST <- ZERO_POB_LIST$GEO_ID
 # POPULATION IMMUNITY ----
 
 ## Read data ----
-immunity_data <- read_excel(
-  PATH_country_data, sheet = 3, skip = 2, col_names = FALSE, col_types = c(
-    "guess", "guess", "guess", "guess", "numeric", "numeric", "numeric",
-    "text", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric",
-    "text"
-  )
-)
+immunity_data <- read_excel(PATH_country_data, sheet = 3, skip = 2, col_names = FALSE)
 colnames(immunity_data) <- c('ADMIN1 GEO_ID', 'GEO_ID', 'ADMIN1', 'ADMIN2', 
-                            'POB1', 'POB5', 'POB15', 'pfa','year1','year2','year3',
-                            'year4','year5','ipv2','effective_campaign')
+                             'POB1', 'POB5', 'POB15', 'pfa','year1','year2','year3',
+                             'year4','year5','ipv2','effective_campaign')
 immunity_data <- admin_normalizer(immunity_data)
 
 ## Filter missing GEO codes ----
@@ -384,7 +404,7 @@ immunity_scores <- immunity_data %>%
   ) %>% 
   rowwise() %>% 
   mutate(
-      immunity_score = sum(c_across(matches('score')), na.rm = T) 
+    immunity_score = sum(c_across(matches('score')), na.rm = T) 
   )
 
 immunity_scores <- immunity_scores %>% 
@@ -392,7 +412,7 @@ immunity_scores <- immunity_scores %>%
     years_score = year1_score + year2_score + year3_score + year4_score + year5_score,
     .after = year5_score
   )
-  
+
 ## Adding to scores_data ----
 immunity_scores_join <- immunity_scores %>% 
   select(
@@ -408,17 +428,11 @@ scores_data <- left_join(scores_data, immunity_scores_join)
 # SURVAILLANCE ----
 
 ## Read data ----
-surveillance_data <- read_excel(
-  PATH_country_data, sheet = 4, skip = 2, col_names = FALSE, col_types = c(
-    "guess", "guess", "guess", "guess", "numeric", "numeric", "numeric",
-    "text", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric",
-    "text"
-  )
-)
+surveillance_data <- read_excel(PATH_country_data, sheet = 4, skip = 2, col_names = FALSE)
 colnames(surveillance_data) <- c('ADMIN1 GEO_ID', 'GEO_ID', 'ADMIN1', 'ADMIN2', 
                                  'POB1', 'POB5', 'POB15', 'pfa', 'compliant_units_percent', 'pfa_rate', 
-                           'pfa_notified_percent', 'pfa_investigated_percent', 
-                           'suitable_samples_percent', 'followups_percent', 'active_search')
+                                 'pfa_notified_percent', 'pfa_investigated_percent', 
+                                 'suitable_samples_percent', 'followups_percent', 'active_search')
 surveillance_data <- admin_normalizer(surveillance_data)
 
 ## Filtering missing GEO codes ----
@@ -448,7 +462,7 @@ surveillance_scores <- surveillance_data %>%
   mutate(
     surveillance_score = sum(c_across(matches('score')), na.rm = T) 
   )
-  
+
 ## Adding to scores_data ----
 surveillance_scores_join <- surveillance_scores %>% 
   select(
@@ -460,12 +474,7 @@ scores_data <- left_join(scores_data, surveillance_scores_join)
 # DETERMINANTS ----
 
 ## Read data ----
-determinants_data <- read_excel(
-  PATH_country_data, sheet = 5, skip = 2, col_names = FALSE, col_types = c(
-    "guess", "guess", "guess", "guess", "numeric", "numeric", "numeric",
-    "text", "numeric", "numeric"
-  )
-)
+determinants_data <- read_excel(PATH_country_data, sheet = 5, skip = 2, col_names = FALSE)
 colnames(determinants_data) <- c('ADMIN1 GEO_ID', 'GEO_ID', 'ADMIN1', 'ADMIN2', 
                                  'POB1', 'POB5', 'POB15', 'pfa', 'drinking_water_percent', 'sanitation_services_percent')
 determinants_data <- admin_normalizer(determinants_data)
@@ -492,7 +501,7 @@ determinants_scores <-  determinants_data %>%
   mutate(
     determinants_score = sum(c_across(matches('score')), na.rm = T) 
   )
-  
+
 
 ## Adding to scores_data ----
 determinants_scores_join <- determinants_scores %>% 
@@ -505,12 +514,7 @@ scores_data <- left_join(scores_data, determinants_scores_join)
 # OUTBREAKS ----
 
 ## Read data ----
-outbreaks_data = read_excel(
-  PATH_country_data, sheet = 6, skip = 2, col_names = FALSE, col_types = c(
-    "guess", "guess", "guess", "guess", "numeric", "numeric", "numeric",
-    "text", "text", "text", "text", "text", "text", "text"
-  )
-)
+outbreaks_data = read_excel(PATH_country_data, sheet = 6, skip = 2, col_names = FALSE)
 colnames(outbreaks_data) =  c('ADMIN1 GEO_ID', 'GEO_ID', 'ADMIN1', 'ADMIN2',
                               'POB1', 'POB5', 'POB15', 'pfa',
                               'polio', 'measles', 'rubella', 'diphtheria', 'yellow_fever', 'tetanus')
@@ -559,7 +563,9 @@ if ("ADMIN1_" %in% colnames(country_shapes)) {
     mutate(`ADMIN1_GEO_ID` = as.character(`ADMIN1_GEO_ID`),GEO_ID = as.character(GEO_ID))
 }
 country_shapes <- country_shapes[!duplicated(country_shapes$GEO_ID),]
-
+data_shapes_id <- immunity_scores$GEO_ID
+country_shapes <- country_shapes %>% 
+  filter(GEO_ID %in% data_shapes_id)
 # DBD VARS ----
 YEAR_LIST <- c(YEAR_1,YEAR_2,YEAR_3,YEAR_4,YEAR_5)
 admin1_list <- c(toupper(lang_label("rep_label_all")),sort(unique(id_data$ADMIN1)))

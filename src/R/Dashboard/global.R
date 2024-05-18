@@ -5,7 +5,9 @@
 # Last Update: 2023-10-09
 # R 4.3.1
 
-Sys.setlocale(locale = "es_ES.UTF-8")
+
+## 2024-05-17 Major fix ----
+#Sys.setlocale(locale = "es_ES.UTF-8")
 
 # LIBS ----
 library(shiny)
@@ -29,7 +31,7 @@ library(mapview)
 library(webshot)
 
 
-#webshot::install_phantomjs(force = TRUE)
+webshot::install_phantomjs(force = TRUE)
 Sys.setenv(OPENSSL_CONF = "/dev/null")
 options(shiny.fullstacktrace = TRUE)
 
@@ -253,3 +255,4 @@ source("immunity.R")
 source("surveillance.R")
 source("determinants.R")
 source("outbreaks.R")
+

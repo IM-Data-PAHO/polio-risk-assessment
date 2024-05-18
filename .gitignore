@@ -48,3 +48,7 @@ QA_report.docx
 # QA figures
 figures/
 
+src/R/Dashboard/www/report_html.html
+src/R/Dashboard/www/report_word.docx
+src/Shapefile_prep/ecuador.json
+src/R/report_html.html

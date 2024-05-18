@@ -173,8 +173,8 @@ function(input, output, session) {
     text_title <- paste(
       lang_label(
         "general_title_map_box"),"-",
-        ifelse(input$admin1_filter == lang_label("filter_all"), COUNTRY_NAME, input$admin1_filter)
-      )
+      ifelse(input$admin1_filter == lang_label("filter_all"), COUNTRY_NAME, input$admin1_filter)
+    )
     text_title <- paste0(text_title," (",YEAR_EVAL,")")
     text_title
   })
@@ -500,7 +500,7 @@ function(input, output, session) {
   output$dl_inmunidad_map_cob_2 <- downloadHandler(
     filename = function() {
       paste0(lang_label("map")," ",input$admin1_filter," ",toupper(COUNTRY_NAME)," ",lang_label("immunity_ipv2_cob")," (",YEAR_EVAL,").png")
-      },
+    },
     content = function(file) {
       mapshot(inmu_map_cob_2$dat, file = file)
     }
@@ -896,11 +896,11 @@ function(input, output, session) {
     ind_rangos_table(LANG_TLS,CUT_OFFS,"outbreaks_score", pfa_filter)
   })
   
- 
-    
-    
-    
-    
-    
+  
+  
+  
+  
+  
+  
   
 }

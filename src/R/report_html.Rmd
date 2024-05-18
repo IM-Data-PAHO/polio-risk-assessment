@@ -6,6 +6,7 @@ output:
   html_document:
     toc: yes
     toc_float: yes
+    self_contained: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -15,7 +16,7 @@ output:
 # Última fecha de modificación: 2023-11-21
 # R 4.3.0
 
-Sys.setlocale(locale = "es_ES.UTF-8")
+#Sys.setlocale(locale = "es_ES.UTF-8")
 
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 

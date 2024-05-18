@@ -13,6 +13,12 @@ output:
 # Autor: Oliver Mazariegos
 # Última fecha de modificación: 2023-11-21
 # R 4.3.0
+# Editorial ----
+# Editor: Rafael León
+# Contact: leonraf@paho.org
+# Date: 2024-05-17
+# Edit: Modified QA Report to consider other languages, previously the tool
+# was not considering even the correct cell to change language
 
 Sys.setlocale(locale = "es_ES.UTF-8")
 

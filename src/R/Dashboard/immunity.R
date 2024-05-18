@@ -4,7 +4,12 @@
 # Author: Oliver Mazariegos & Luis Quezada
 # Última fecha de modificación: 2023-11-06
 # R 4.3.1
-
+# Editorial ----
+# Editor: Rafael León
+# Contact: leonraf@paho.org
+# Date: 2024-05-17
+# Edit: Modified RISK eval to consider other languages, previously the tool
+# was not considering even the correct cell to change language
 
 inmu_title_map <- function(LANG_TLS,YEAR_CAMP_SR,COUNTRY_NAME,YEAR_LIST,admin1,var) {
   YEAR_1=YEAR_LIST[1];YEAR_2=YEAR_LIST[2];YEAR_3=YEAR_LIST[3];YEAR_4=YEAR_LIST[4];YEAR_5=YEAR_LIST[5];
@@ -38,13 +43,14 @@ inmu_plot_map_data <- function(LANG_TLS,YEAR_CAMP_SR,COUNTRY_NAME,YEAR_LIST,
   #     data <- data %>% filter(POB15 >= 100000)
   #   }
   # }
-
+  
   
   map_data <- full_join(map_data,data,by = c("GEO_ID" = "GEO_ID", "ADMIN1 GEO_ID" = "ADMIN1 GEO_ID"))
   
   map_data$`ADMIN1 GEO_ID`[is.na(map_data$`ADMIN1 GEO_ID`) & map_data$ADMIN1 == admin1] <- admin1_geo_id_df$`ADMIN1 GEO_ID`[admin1_geo_id_df$ADMIN1 == admin1]
-
+  
   map_data$risk_level <- get_risk_level(LANG_TLS,CUT_OFFS,indicator,map_data$immunity_score,map_data$population_and_pfa_bool)
+  
   
   if (var_to_summarise %in% c("immunity_score")) {
     map_data <- map_data %>% rename("PR" = var_to_summarise)
@@ -223,9 +229,9 @@ inmu_plot_map_data <- function(LANG_TLS,YEAR_CAMP_SR,COUNTRY_NAME,YEAR_LIST,
         ) %>% addLegend(layerId = "map_title","topright",color = "white", opacity = 0,labels=HTML(paste0("<strong>",inmu_title_map(LANG_TLS,YEAR_CAMP_SR,COUNTRY_NAME,YEAR_LIST,admin1,var_to_summarise),"</strong>"))) %>%
         addLegend(title = lang_label_tls(LANG_TLS,"risk_points"),colors = legend_colors,labels = legend_values, opacity = 0.5, position = 'topright')
     }
-
+    
   } else if (var_to_summarise %in% c("ipv2",
-    "year1","year2","year3","year4","year5")) {
+                                     "year1","year2","year3","year4","year5")) {
     # Cob map
     map_data <- map_data %>% rename("COB"=var_to_summarise)
     map_data$COB <- round(map_data$COB,1)
@@ -238,7 +244,7 @@ inmu_plot_map_data <- function(LANG_TLS,YEAR_CAMP_SR,COUNTRY_NAME,YEAR_LIST,
         filter(`ADMIN1 GEO_ID` == admin1_id) %>% 
         select(GEO_ID,ADMIN1,ADMIN2,COB,geometry, POB15, risk_level)
     }
-
+    
     map_data <- map_data %>% mutate(
       cob_level_num = case_when(
         GEO_ID %in% ZERO_POB_LIST ~ 5,
@@ -295,7 +301,7 @@ inmu_plot_map_data <- function(LANG_TLS,YEAR_CAMP_SR,COUNTRY_NAME,YEAR_LIST,
     if (6 %in% map_data$cob_level_num) {
       legend_colors = c(legend_colors, "#0097e6")
       legend_values = c(legend_values,lang_label_tls(LANG_TLS,"over_100"))
-
+      
     }
     
     if (7 %in% map_data$cob_level_num) {
@@ -341,7 +347,7 @@ inmu_plot_map_data <- function(LANG_TLS,YEAR_CAMP_SR,COUNTRY_NAME,YEAR_LIST,
     # Cob map
     map_data <- map_data %>% rename("COB"=var_to_summarise)
     
-
+    
     if (admin1_id == 0) {
       map_data <- map_data %>% select(GEO_ID,ADMIN1,ADMIN2,COB,geometry, POB15, risk_level)
     } else {
@@ -395,8 +401,8 @@ inmu_plot_map_data <- function(LANG_TLS,YEAR_CAMP_SR,COUNTRY_NAME,YEAR_LIST,
       map_data$var_num[map_data$risk_level != risk_filter] <- 4
       map_data$var_word[map_data$risk_level != risk_filter] <- lang_label("na")
     }
-
-
+    
+    
     pal_gradient <- colorNumeric(
       c("#666666","#92d050","#e8132b","#9bc2e6", "#111111"),
       domain = c(0,4)
@@ -451,7 +457,7 @@ inmu_plot_map_data <- function(LANG_TLS,YEAR_CAMP_SR,COUNTRY_NAME,YEAR_LIST,
       addLegend(layerId = "map_title","topright",color = "white", opacity = 0,labels=HTML(paste0("<strong>",inmu_title_map(LANG_TLS,YEAR_CAMP_SR,COUNTRY_NAME,YEAR_LIST,admin1,var_to_summarise),"</strong>"))) %>%
       addLegend(title = lang_label_tls(LANG_TLS,"immunity_effective_cob_legend"),colors = legend_colors,labels = legend_values, opacity = 0.5, position = 'topright')
   }
-
+  
   return(map)
   
 }

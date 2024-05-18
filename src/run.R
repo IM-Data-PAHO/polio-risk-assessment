@@ -4,8 +4,8 @@
 # Última fecha de modificación: 2023-11-10
 # R 4.3.1
 
-
-Sys.setlocale(locale = "es_ES.UTF-8")
+## 2024-05-17 Major fix ----
+#Sys.setlocale(locale = "es_ES.UTF-8")
 
 # SETUP                             -------------------------------
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
