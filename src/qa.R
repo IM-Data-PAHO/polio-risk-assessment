@@ -15,8 +15,12 @@
 
 library(pacman)
 p_load(tidyverse,tidyr,readxl,shiny,
-       webshot,sf,sp,mapview,leaflet,
+       webshot,shinydashboard,sf,sp,mapview,leaflet,
        htmltools,DT,data.table,writexl)
+if (!webshot::is_phantomjs_installed()) {
+  webshot::install_phantomjs(force=TRUE)
+}
+
 
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 

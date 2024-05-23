@@ -1,3 +1,6 @@
 # install all dependencies
 renv::install(prompt = FALSE)
-webshot::install_phantomjs()
+if (!webshot::is_phantomjs_installed()) {
+  webshot::install_phantomjs(force=TRUE)
+}
+  

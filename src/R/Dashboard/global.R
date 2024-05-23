@@ -31,7 +31,11 @@ library(mapview)
 library(webshot)
 
 
-webshot::install_phantomjs(force = TRUE)
+if (!webshot::is_phantomjs_installed()) {
+  webshot::install_phantomjs(force=TRUE)
+}
+
+
 Sys.setenv(OPENSSL_CONF = "/dev/null")
 options(shiny.fullstacktrace = TRUE)
 
