@@ -205,7 +205,7 @@ total_admin2 <- config_data[4,2][[1]]
 total_admin2 <- ifelse(is.na(total_admin2), lang_label("na_test_na_data"), cFormat(total_admin2,0))
 
 polio_scheme <- config_data[5,2][[1]]
-polio_scheme <- ifelse(is.na(polio_scheme), lang_label("na_test_na_data"), cFormat(polio_scheme,0))
+polio_scheme <- ifelse(is.na(polio_scheme), lang_label("na_test_na_data"), polio_scheme)
 
 polio3_year1 <- mean(immunity_scores$year1, na.rm = TRUE)
 polio3_year1 <- ifelse(is.na(polio3_year1), lang_label("na_test_na_data"), cFormat(polio3_year1,0))
@@ -232,13 +232,13 @@ table_1a <- data.frame(
     lang_label("table_1a_pob5"),
     lang_label("table_1a_pob15"),
     lang_label("table_1a_admin2"),
-    lang_label("table_1a_polio_scheme"),
-    paste(lang_label("table_1a_polio_coverage"), YEAR_1),
-    paste(lang_label("table_1a_polio_coverage"), YEAR_2),
-    paste(lang_label("table_1a_polio_coverage"), YEAR_3),
-    paste(lang_label("table_1a_polio_coverage"), YEAR_4),
-    paste(lang_label("table_1a_polio_coverage"), YEAR_5),
-    lang_label("table_1a_pfa_rate")
+    lang_label("table_1a_polio_scheme") #,
+  #  paste(lang_label("table_1a_polio_coverage"), YEAR_1),
+ #   paste(lang_label("table_1a_polio_coverage"), YEAR_2),
+ #   paste(lang_label("table_1a_polio_coverage"), YEAR_3),
+ #   paste(lang_label("table_1a_polio_coverage"), YEAR_4),
+ #   paste(lang_label("table_1a_polio_coverage"), YEAR_5),
+ #   lang_label("table_1a_pfa_rate")
   ),
   valor = c(
     total_population,
@@ -246,13 +246,13 @@ table_1a <- data.frame(
     total_population5,
     total_population15,
     total_admin2,
-    polio_scheme,
-    paste0(polio3_year1, "%"),
-    paste0(polio3_year2, "%"),
-    paste0(polio3_year3, "%"),
-    paste0(polio3_year4, "%"),
-    paste0(polio3_year5, "%"),
-    pfa_rate
+    polio_scheme #,
+ #   paste0(polio3_year1, "%"),
+ #   paste0(polio3_year2, "%"),
+ #   paste0(polio3_year3, "%"),
+ #   paste0(polio3_year4, "%"),
+ #   paste0(polio3_year5, "%"),
+ #   pfa_rate
   )
 )
 
@@ -268,7 +268,7 @@ flextable::flextable(table_1a) %>%
 
 pop_LR <- pop_data[which(risk_levels_df$level == lang_label("LR")),]
 pob1_LR <- sum(pop_LR$POB1, na.rm = TRUE)
-pob1_LR <- ifelse(is.na(pob1_LR) | pob1_LR == 0, NA, round(pob1_LR/sum(pop_data$POB1 * 100,2)))
+pob1_LR <- ifelse(is.na(pob1_LR) | pob1_LR == 0, NA, round(pob1_LR/sum(pop_data$POB1) * 100,2))
 pob5_LR <- sum(pop_LR$POB5, na.rm = TRUE)
 pob5_LR <- ifelse(is.na(pob5_LR) | pob5_LR == 0, NA, round(pob5_LR/sum(pop_data$POB5) * 100, 2))
 pob15_LR <- sum(pop_LR$POB15, na.rm = TRUE)
@@ -279,7 +279,7 @@ pob_LR <- ifelse(is.na(pob_LR) | pob_LR == 0, NA, round(pob_LR/sum(pop_data$POB)
 
 pop_MR <- pop_data[which(risk_levels_df$level == lang_label("MR")),]
 pob1_MR <- sum(pop_MR$POB1, na.rm = TRUE)
-pob1_MR <- ifelse(is.na(pob1_MR) | pob1_MR == 0, NA, round(pob1_MR/sum(pop_data$POB1 * 100,2)))
+pob1_MR <- ifelse(is.na(pob1_MR) | pob1_MR == 0, NA, round(pob1_MR/sum(pop_data$POB1) * 100,2))
 pob5_MR <- sum(pop_MR$POB5, na.rm = TRUE)
 pob5_MR <- ifelse(is.na(pob5_MR) | pob5_MR == 0, NA, round(pob5_MR/sum(pop_data$POB5) * 100, 2))
 pob15_MR <- sum(pop_MR$POB15, na.rm = TRUE)
@@ -290,7 +290,7 @@ pob_MR <- ifelse(is.na(pob_MR) | pob_MR == 0, NA, round(pob_MR/sum(pop_data$POB)
 
 pop_HR <- pop_data[which(risk_levels_df$level == lang_label("HR")),]
 pob1_HR <- sum(pop_HR$POB1, na.rm = TRUE)
-pob1_HR <- ifelse(is.na(pob1_HR) | pob1_HR == 0, NA, round(pob1_HR/sum(pop_data$POB1 * 100,2)))
+pob1_HR <- ifelse(is.na(pob1_HR) | pob1_HR == 0, NA, round(pob1_HR/sum(pop_data$POB1) * 100,2))
 pob5_HR <- sum(pop_HR$POB5, na.rm = TRUE)
 pob5_HR <- ifelse(is.na(pob5_HR) | pob5_HR == 0, NA, round(pob5_HR/sum(pop_data$POB5) * 100, 2))
 pob15_HR <- sum(pop_HR$POB15, na.rm = TRUE)
@@ -301,7 +301,7 @@ pob_HR <- ifelse(is.na(pob_HR) | pob_HR == 0, NA, round(pob_HR/sum(pop_data$POB)
 
 pop_VHR <- pop_data[which(risk_levels_df$level == lang_label("VHR")),]
 pob1_VHR <- sum(pop_VHR$POB1, na.rm = TRUE)
-pob1_VHR <- ifelse(is.na(pob1_VHR) | pob1_VHR == 0, NA, round(pob1_VHR/sum(pop_data$POB1 * 100,2)))
+pob1_VHR <- ifelse(is.na(pob1_VHR) | pob1_VHR == 0, NA, round(pob1_VHR/sum(pop_data$POB1) * 100,2))
 pob5_VHR <- sum(pop_VHR$POB5, na.rm = TRUE)
 pob5_VHR <- ifelse(is.na(pob5_VHR) | pob5_VHR == 0, NA, round(pob5_VHR/sum(pop_data$POB5) * 100, 2))
 pob15_VHR <- sum(pop_VHR$POB15, na.rm = TRUE)
