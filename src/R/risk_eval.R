@@ -10,6 +10,15 @@
 # Date: 2024-05-17
 # Edit: Modified RISK eval to consider other languages, previously the tool
 # was not considering even the correct cell to change language
+# ---------------
+# Editor: Rafael León
+# Contact: leonraf@paho.org
+# Date: 2024-12-03
+# Edit: Modified RISK EVAL to include an excel output to the Data folder
+# This excel output includes the process required to produce the summary risk
+# table for the country's data
+# ---------------
+
 
 rm(list = ls())
 # PATHS ----
@@ -553,6 +562,11 @@ scores_data <- scores_data %>%
   mutate(
     total_score = sum(c_across(matches('score')), na.rm = T) 
   )
+# Save total score to excel file ----
+export(scores_data, paste0(PATH_global,"Data/polio_results.xlsx"))
+
+
+
 
 # SHAPEFILES ----
 country_shapes <- st_read(PATH_shapefiles,layer = "admin2")
@@ -593,7 +607,6 @@ rm(determinants_scores_join,
    surveillance_scores_join,
    sheet_cut_off)
 save.image(file = paste0(PATH_global, "R/Dashboard/POLIO.RData"))
-
 # CLEAN ----
 rm(list = ls())
 
