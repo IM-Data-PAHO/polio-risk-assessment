@@ -22,15 +22,49 @@
 
 rm(list = ls())
 # PATHS ----
-file_path = rstudioapi::getSourceEditorContext()$path
-file_path_index = unlist(gregexec('R/risk_eval.R',file_path))[1]
-PATH_global = substr(file_path,1,file_path_index - 1)
-PATH_country_data   = paste0(PATH_global,"Data/country_data.xlsx")
-PATH_risk_cut_offs  = paste0(PATH_global,"R/risk_cut_offs.xlsx")
-PATH_shapefiles     = paste0(PATH_global,"Data/shapefiles/")
-PATH_translations   = paste0(PATH_global,"R/translations.xlsx")
+resolve_script_path <- function() {
+  cmd_args <- commandArgs(trailingOnly = FALSE)
+  file_arg <- "--file="
+  matched <- grep(file_arg, cmd_args)
+  if (length(matched) > 0) {
+    return(normalizePath(sub(file_arg, "", cmd_args[matched][1]), mustWork = FALSE))
+  }
+  if (!is.null(sys.frames()) && length(sys.frames()) > 0) {
+    for (frame in rev(sys.frames())) {
+      if (!is.null(frame$ofile)) {
+        return(normalizePath(frame$ofile, mustWork = FALSE))
+      }
+    }
+  }
+  return(NA_character_)
+}
+
+script_path <- resolve_script_path()
+script_dir <- if (!is.na(script_path)) {
+  normalizePath(dirname(script_path), mustWork = FALSE)
+} else {
+  normalizePath(getwd(), mustWork = FALSE)
+}
+
+candidate_root <- normalizePath(file.path(script_dir, ".."), mustWork = FALSE)
+if (dir.exists(file.path(candidate_root, "Data"))) {
+  PATH_global <- candidate_root
+} else if (dir.exists(file.path(script_dir, "Data"))) {
+  PATH_global <- script_dir
+} else {
+  PATH_global <- normalizePath(getwd(), mustWork = FALSE)
+}
+
+PATH_country_data   = file.path(PATH_global,"Data","country_data.xlsx")
+PATH_risk_cut_offs  = file.path(PATH_global,"R","risk_cut_offs.xlsx")
+PATH_shapefiles     = file.path(PATH_global,"Data","shapefiles")
+PATH_translations   = file.path(PATH_global,"R","translations.xlsx")
 
 # SETUP ----
+library(readxl)
+library(sf)
+library(tidyverse)
+
 ## 2024-05-17 Major fix ----
 LANG <- as.character(read_excel(PATH_country_data,sheet = 1)[3,2])
 
@@ -50,16 +84,7 @@ if(LANG == "FRA"){
   Sys.setlocale(locale = "fr_FR.UTF-8")
 }
 
-library(readxl)
-library(sf)
-library(tidyverse)
-
-
-
-
-
 # VARS ----
-LANG <- as.character(read_excel(PATH_country_data,sheet = 1)[3,2])
 
 # LANG ----
 LANG_TLS <- read_excel(PATH_translations,sheet = "DASHBOARD") %>% 
@@ -69,14 +94,60 @@ lang_label <- function(label) {
   return(LANG_TLS$LANG[LANG_TLS$LABEL == label])
 }
 
+get_indicator_risk_level <- function(indicator, risk_points, pfa_vector = NULL) {
+  if (is.null(pfa_vector)) {
+    pfa_vector <- rep(FALSE, length(risk_points))
+  }
+  pfa_vector[is.na(pfa_vector)] <- FALSE
+  
+  lookup_cutoff <- function(level, is_pfa) {
+    values <- CUT_OFFS$value[
+      CUT_OFFS$RV == indicator &
+        CUT_OFFS$risk_level == level &
+        CUT_OFFS$PFA == is_pfa
+    ]
+    if (length(values) == 0) {
+      return(NA_real_)
+    }
+    return(values[[1]])
+  }
+  
+  risk_levels <- vector("character", length(risk_points))
+  for (i in seq_along(risk_points)) {
+    score_val <- risk_points[[i]]
+    is_pfa <- pfa_vector[[i]]
+    if (is.na(score_val)) {
+      risk_levels[[i]] <- lang_label("no_data")
+      next
+    }
+    
+    lr_limit <- lookup_cutoff("LR", is_pfa)
+    mr_limit <- lookup_cutoff("MR", is_pfa)
+    hr_limit <- lookup_cutoff("HR", is_pfa)
+    
+    if (!is.na(lr_limit) && score_val <= lr_limit) {
+      risk_levels[[i]] <- lang_label("LR")
+    } else if (!is.na(mr_limit) && score_val <= mr_limit) {
+      risk_levels[[i]] <- lang_label("MR")
+    } else if (!is.na(hr_limit) && score_val <= hr_limit) {
+      risk_levels[[i]] <- lang_label("HR")
+    } else {
+      risk_levels[[i]] <- lang_label("VHR")
+    }
+  }
+  
+  return(risk_levels)
+}
+
+cut_offs_dest <- file.path(PATH_global,"R","Dashboard","www","cut_offs_download.xlsx")
 if (LANG == "SPA") {
-  file.copy(from = "R/cut_offs_excel/cut_offs_download_SPA.xlsx",to ="R/Dashboard/www/cut_offs_download.xlsx",overwrite = TRUE)
+  file.copy(from = file.path(PATH_global,"R","cut_offs_excel","cut_offs_download_SPA.xlsx"), to = cut_offs_dest, overwrite = TRUE)
 } else if (LANG == "ENG") {
-  file.copy(from = "R/cut_offs_excel/cut_offs_download_ENG.xlsx",to ="R/Dashboard/www/cut_offs_download.xlsx",overwrite = TRUE)
+  file.copy(from = file.path(PATH_global,"R","cut_offs_excel","cut_offs_download_ENG.xlsx"), to = cut_offs_dest, overwrite = TRUE)
 } else if (LANG == "POR") {
-  file.copy(from = "R/cut_offs_excel/cut_offs_download_POR.xlsx",to ="R/Dashboard/www/cut_offs_download.xlsx",overwrite = TRUE)
+  file.copy(from = file.path(PATH_global,"R","cut_offs_excel","cut_offs_download_POR.xlsx"), to = cut_offs_dest, overwrite = TRUE)
 } else if (LANG == "FRA") {
-  file.copy(from = "R/cut_offs_excel/cut_offs_download_FRA.xlsx",to ="R/Dashboard/www/cut_offs_download.xlsx",overwrite = TRUE)
+  file.copy(from = file.path(PATH_global,"R","cut_offs_excel","cut_offs_download_FRA.xlsx"), to = cut_offs_dest, overwrite = TRUE)
 }
 
 rep_label_admin1_name = lang_label("rep_label_admin1_name")
@@ -562,8 +633,155 @@ scores_data <- scores_data %>%
   mutate(
     total_score = sum(c_across(matches('score')), na.rm = T) 
   )
-# Save total score to excel file ----
-export(scores_data, paste0(PATH_global,"Data/polio_results.xlsx"))
+# Save dashboard tables to Excel workbook ----
+pfa_general_vector <- population_and_pfa(scores_data)
+
+general_risk_export <- scores_data %>%
+  mutate(
+    immunity_score = round(immunity_score, 0),
+    surveillance_score = round(surveillance_score, 0),
+    determinants_score = round(determinants_score, 0),
+    outbreaks_score = round(outbreaks_score, 0),
+    total_score = round(total_score, 0),
+    qualitative_risk = get_indicator_risk_level("total_score", total_score, pfa_general_vector)
+  ) %>%
+  select(
+    ADMIN1,
+    ADMIN2,
+    immunity_score,
+    surveillance_score,
+    determinants_score,
+    outbreaks_score,
+    total_score,
+    qualitative_risk
+  )
+
+colnames(general_risk_export) <- c(
+  lang_label("table_admin1_name"),
+  lang_label("table_admin2_name"),
+  lang_label("menuitem_immunity"),
+  lang_label("menuitem_surveillance"),
+  lang_label("menuitem_determinants"),
+  lang_label("menuitem_outbreaks"),
+  lang_label("risk_points"),
+  lang_label("risk_level")
+)
+
+population_immunity_export <- immunity_scores %>%
+  mutate(
+    year1 = round(year1, 0),
+    year2 = round(year2, 0),
+    year3 = round(year3, 0),
+    year4 = round(year4, 0),
+    year5 = round(year5, 0),
+    ipv2 = round(ipv2, 0),
+    years_score = round(years_score, 0),
+    ipv_score = round(ipv_score, 0),
+    effective_campaign_score = round(effective_campaign_score, 0),
+    immunity_score = round(immunity_score, 0),
+    qualitative_risk = get_indicator_risk_level("immunity_score", immunity_score, population_and_pfa_bool)
+  ) %>%
+  select(
+    ADMIN1,
+    ADMIN2,
+    POB1,
+    POB5,
+    POB15,
+    year1,
+    year2,
+    year3,
+    year4,
+    year5,
+    years_score,
+    ipv2,
+    ipv_score,
+    effective_campaign,
+    effective_campaign_score,
+    immunity_score,
+    qualitative_risk
+  )
+
+colnames(population_immunity_export) <- c(
+  lang_label("table_admin1_name"),
+  lang_label("table_admin2_name"),
+  "POB1",
+  "POB5",
+  "POB15",
+  paste(lang_label("immunity_polio_cob"), YEAR_1, "(%)"),
+  paste(lang_label("immunity_polio_cob"), YEAR_2, "(%)"),
+  paste(lang_label("immunity_polio_cob"), YEAR_3, "(%)"),
+  paste(lang_label("immunity_polio_cob"), YEAR_4, "(%)"),
+  paste(lang_label("immunity_polio_cob"), YEAR_5, "(%)"),
+  lang_label("immunity_polio_score"),
+  lang_label("immunity_ipv2_cob"),
+  lang_label("immunity_ipv2_score"),
+  lang_label("immunity_effective_cob"),
+  lang_label("immunity_effective_score"),
+  lang_label("total_pr"),
+  lang_label("risk_level")
+)
+
+quality_of_surveillance_export <- surveillance_scores %>%
+  mutate(
+    compliant_units_percent = round(compliant_units_percent, 0),
+    pfa_rate = round(pfa_rate, 2),
+    pfa_notified_percent = round(pfa_notified_percent, 0),
+    pfa_investigated_percent = round(pfa_investigated_percent, 0),
+    suitable_samples_percent = round(suitable_samples_percent, 0),
+    followups_percent = round(followups_percent, 0),
+    surveillance_score = round(surveillance_score, 0),
+    qualitative_risk = get_indicator_risk_level("surveillance_score", surveillance_score, population_and_pfa_bool)
+  ) %>%
+  select(
+    ADMIN1,
+    ADMIN2,
+    surveillance_score,
+    compliant_units_percent,
+    compliant_units_score,
+    pfa_rate,
+    pfa_rate_score,
+    pfa_notified_percent,
+    pfa_notified_score,
+    pfa_investigated_percent,
+    pfa_investigated_score,
+    suitable_samples_percent,
+    suitable_samples_score,
+    followups_percent,
+    followups_score,
+    active_search,
+    active_search_score,
+    qualitative_risk
+  )
+
+colnames(quality_of_surveillance_export) <- c(
+  lang_label("table_admin1_name"),
+  lang_label("table_admin2_name"),
+  lang_label("total_pr"),
+  lang_label("surveillance_title_map_reporting_units"),
+  lang_label("surveillance_reporting_units_score"),
+  lang_label("surveillance_pfa_rate"),
+  lang_label("surveillance_pfa_rate_score"),
+  lang_label("surveillance_title_map_pfa_notification"),
+  lang_label("surveillance_pfa_notification_score"),
+  lang_label("surveillance_title_map_pfa_investigated"),
+  lang_label("surveillance_pfa_investigated_score"),
+  lang_label("surveillance_title_map_suitable_samples"),
+  lang_label("surveillance_suitable_samples_score"),
+  lang_label("surveillance_title_map_followups"),
+  lang_label("surveillance_followups_score"),
+  lang_label("surveillance_title_map_active_search"),
+  lang_label("surveillance_active_search_score"),
+  lang_label("risk_level")
+)
+
+rio::export(
+  list(
+    general_risk = general_risk_export,
+    population_immunity = population_immunity_export,
+    quality_of_surveillance = quality_of_surveillance_export
+  ),
+  file.path(PATH_global,"Data","polio_results.xlsx")
+)
 
 
 
@@ -606,8 +824,6 @@ rm(determinants_scores_join,
    outbreaks_scores_join,
    surveillance_scores_join,
    sheet_cut_off)
-save.image(file = paste0(PATH_global, "R/Dashboard/POLIO.RData"))
+save.image(file = file.path(PATH_global, "R","Dashboard","POLIO.RData"))
 # CLEAN ----
 rm(list = ls())
-
-
