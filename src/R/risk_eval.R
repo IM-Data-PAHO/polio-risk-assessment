@@ -402,6 +402,169 @@ score_outbreak <- function(outbreaks_df, disease) {
   return(score)
 }
 
+# DASHBOARD EXPORT HELPERS ----
+build_general_risk_tab <- function(scores_df) {
+  pfa_vector <- population_and_pfa(scores_df)
+  general_risk <- scores_df %>%
+    mutate(
+      immunity_score = round(immunity_score, 0),
+      surveillance_score = round(surveillance_score, 0),
+      determinants_score = round(determinants_score, 0),
+      outbreaks_score = round(outbreaks_score, 0),
+      total_score = round(total_score, 0),
+      qualitative_risk = get_indicator_risk_level("total_score", total_score, pfa_vector)
+    ) %>%
+    select(
+      ADMIN1,
+      ADMIN2,
+      immunity_score,
+      surveillance_score,
+      determinants_score,
+      outbreaks_score,
+      total_score,
+      qualitative_risk
+    )
+  
+  colnames(general_risk) <- c(
+    lang_label("table_admin1_name"),
+    lang_label("table_admin2_name"),
+    lang_label("menuitem_immunity"),
+    lang_label("menuitem_surveillance"),
+    lang_label("menuitem_determinants"),
+    lang_label("menuitem_outbreaks"),
+    lang_label("risk_points"),
+    lang_label("risk_level")
+  )
+  
+  return(general_risk)
+}
+
+build_population_immunity_tab <- function(immunity_df) {
+  population_immunity <- immunity_df %>%
+    mutate(
+      year1 = round(year1, 0),
+      year2 = round(year2, 0),
+      year3 = round(year3, 0),
+      year4 = round(year4, 0),
+      year5 = round(year5, 0),
+      ipv2 = round(ipv2, 0),
+      years_score = round(years_score, 0),
+      ipv_score = round(ipv_score, 0),
+      effective_campaign_score = round(effective_campaign_score, 0),
+      immunity_score = round(immunity_score, 0),
+      qualitative_risk = get_indicator_risk_level("immunity_score", immunity_score, population_and_pfa_bool)
+    ) %>%
+    select(
+      ADMIN1,
+      ADMIN2,
+      POB1,
+      POB5,
+      POB15,
+      year1,
+      year2,
+      year3,
+      year4,
+      year5,
+      years_score,
+      ipv2,
+      ipv_score,
+      effective_campaign,
+      effective_campaign_score,
+      immunity_score,
+      qualitative_risk
+    )
+  
+  colnames(population_immunity) <- c(
+    lang_label("table_admin1_name"),
+    lang_label("table_admin2_name"),
+    "POB1",
+    "POB5",
+    "POB15",
+    paste(lang_label("immunity_polio_cob"), YEAR_1, "(%)"),
+    paste(lang_label("immunity_polio_cob"), YEAR_2, "(%)"),
+    paste(lang_label("immunity_polio_cob"), YEAR_3, "(%)"),
+    paste(lang_label("immunity_polio_cob"), YEAR_4, "(%)"),
+    paste(lang_label("immunity_polio_cob"), YEAR_5, "(%)"),
+    lang_label("immunity_polio_score"),
+    lang_label("immunity_ipv2_cob"),
+    lang_label("immunity_ipv2_score"),
+    lang_label("immunity_effective_cob"),
+    lang_label("immunity_effective_score"),
+    lang_label("total_pr"),
+    lang_label("risk_level")
+  )
+  
+  return(population_immunity)
+}
+
+build_quality_of_surveillance_tab <- function(surveillance_df) {
+  quality_tab <- surveillance_df %>%
+    mutate(
+      compliant_units_percent = round(compliant_units_percent, 0),
+      pfa_rate = round(pfa_rate, 2),
+      pfa_notified_percent = round(pfa_notified_percent, 0),
+      pfa_investigated_percent = round(pfa_investigated_percent, 0),
+      suitable_samples_percent = round(suitable_samples_percent, 0),
+      followups_percent = round(followups_percent, 0),
+      surveillance_score = round(surveillance_score, 0),
+      qualitative_risk = get_indicator_risk_level("surveillance_score", surveillance_score, population_and_pfa_bool)
+    ) %>%
+    select(
+      ADMIN1,
+      ADMIN2,
+      surveillance_score,
+      compliant_units_percent,
+      compliant_units_score,
+      pfa_rate,
+      pfa_rate_score,
+      pfa_notified_percent,
+      pfa_notified_score,
+      pfa_investigated_percent,
+      pfa_investigated_score,
+      suitable_samples_percent,
+      suitable_samples_score,
+      followups_percent,
+      followups_score,
+      active_search,
+      active_search_score,
+      qualitative_risk
+    )
+  
+  colnames(quality_tab) <- c(
+    lang_label("table_admin1_name"),
+    lang_label("table_admin2_name"),
+    lang_label("total_pr"),
+    lang_label("surveillance_title_map_reporting_units"),
+    lang_label("surveillance_reporting_units_score"),
+    lang_label("surveillance_pfa_rate"),
+    lang_label("surveillance_pfa_rate_score"),
+    lang_label("surveillance_title_map_pfa_notification"),
+    lang_label("surveillance_pfa_notification_score"),
+    lang_label("surveillance_title_map_pfa_investigated"),
+    lang_label("surveillance_pfa_investigated_score"),
+    lang_label("surveillance_title_map_suitable_samples"),
+    lang_label("surveillance_suitable_samples_score"),
+    lang_label("surveillance_title_map_followups"),
+    lang_label("surveillance_followups_score"),
+    lang_label("surveillance_title_map_active_search"),
+    lang_label("surveillance_active_search_score"),
+    lang_label("risk_level")
+  )
+  
+  return(quality_tab)
+}
+
+export_results_workbook <- function(path, general_tab, immunity_tab, quality_tab) {
+  rio::export(
+    list(
+      general_risk = general_tab,
+      population_immunity = immunity_tab,
+      quality_of_surveillance = quality_tab
+    ),
+    path
+  )
+}
+
 
 # OPTS ----
 ## 2024-05-17 Major fix ----
@@ -633,156 +796,16 @@ scores_data <- scores_data %>%
   mutate(
     total_score = sum(c_across(matches('score')), na.rm = T) 
   )
-# Save dashboard tables to Excel workbook ----
-pfa_general_vector <- population_and_pfa(scores_data)
-
-general_risk_export <- scores_data %>%
-  mutate(
-    immunity_score = round(immunity_score, 0),
-    surveillance_score = round(surveillance_score, 0),
-    determinants_score = round(determinants_score, 0),
-    outbreaks_score = round(outbreaks_score, 0),
-    total_score = round(total_score, 0),
-    qualitative_risk = get_indicator_risk_level("total_score", total_score, pfa_general_vector)
-  ) %>%
-  select(
-    ADMIN1,
-    ADMIN2,
-    immunity_score,
-    surveillance_score,
-    determinants_score,
-    outbreaks_score,
-    total_score,
-    qualitative_risk
-  )
-
-colnames(general_risk_export) <- c(
-  lang_label("table_admin1_name"),
-  lang_label("table_admin2_name"),
-  lang_label("menuitem_immunity"),
-  lang_label("menuitem_surveillance"),
-  lang_label("menuitem_determinants"),
-  lang_label("menuitem_outbreaks"),
-  lang_label("risk_points"),
-  lang_label("risk_level")
+# DASHBOARD TABLES ----
+general_risk_export <- build_general_risk_tab(scores_data)
+population_immunity_export <- build_population_immunity_tab(immunity_scores)
+quality_of_surveillance_export <- build_quality_of_surveillance_tab(surveillance_scores)
+export_results_workbook(
+  file.path(PATH_global,"Data","polio_results.xlsx"),
+  general_risk_export,
+  population_immunity_export,
+  quality_of_surveillance_export
 )
-
-population_immunity_export <- immunity_scores %>%
-  mutate(
-    year1 = round(year1, 0),
-    year2 = round(year2, 0),
-    year3 = round(year3, 0),
-    year4 = round(year4, 0),
-    year5 = round(year5, 0),
-    ipv2 = round(ipv2, 0),
-    years_score = round(years_score, 0),
-    ipv_score = round(ipv_score, 0),
-    effective_campaign_score = round(effective_campaign_score, 0),
-    immunity_score = round(immunity_score, 0),
-    qualitative_risk = get_indicator_risk_level("immunity_score", immunity_score, population_and_pfa_bool)
-  ) %>%
-  select(
-    ADMIN1,
-    ADMIN2,
-    POB1,
-    POB5,
-    POB15,
-    year1,
-    year2,
-    year3,
-    year4,
-    year5,
-    years_score,
-    ipv2,
-    ipv_score,
-    effective_campaign,
-    effective_campaign_score,
-    immunity_score,
-    qualitative_risk
-  )
-
-colnames(population_immunity_export) <- c(
-  lang_label("table_admin1_name"),
-  lang_label("table_admin2_name"),
-  "POB1",
-  "POB5",
-  "POB15",
-  paste(lang_label("immunity_polio_cob"), YEAR_1, "(%)"),
-  paste(lang_label("immunity_polio_cob"), YEAR_2, "(%)"),
-  paste(lang_label("immunity_polio_cob"), YEAR_3, "(%)"),
-  paste(lang_label("immunity_polio_cob"), YEAR_4, "(%)"),
-  paste(lang_label("immunity_polio_cob"), YEAR_5, "(%)"),
-  lang_label("immunity_polio_score"),
-  lang_label("immunity_ipv2_cob"),
-  lang_label("immunity_ipv2_score"),
-  lang_label("immunity_effective_cob"),
-  lang_label("immunity_effective_score"),
-  lang_label("total_pr"),
-  lang_label("risk_level")
-)
-
-quality_of_surveillance_export <- surveillance_scores %>%
-  mutate(
-    compliant_units_percent = round(compliant_units_percent, 0),
-    pfa_rate = round(pfa_rate, 2),
-    pfa_notified_percent = round(pfa_notified_percent, 0),
-    pfa_investigated_percent = round(pfa_investigated_percent, 0),
-    suitable_samples_percent = round(suitable_samples_percent, 0),
-    followups_percent = round(followups_percent, 0),
-    surveillance_score = round(surveillance_score, 0),
-    qualitative_risk = get_indicator_risk_level("surveillance_score", surveillance_score, population_and_pfa_bool)
-  ) %>%
-  select(
-    ADMIN1,
-    ADMIN2,
-    surveillance_score,
-    compliant_units_percent,
-    compliant_units_score,
-    pfa_rate,
-    pfa_rate_score,
-    pfa_notified_percent,
-    pfa_notified_score,
-    pfa_investigated_percent,
-    pfa_investigated_score,
-    suitable_samples_percent,
-    suitable_samples_score,
-    followups_percent,
-    followups_score,
-    active_search,
-    active_search_score,
-    qualitative_risk
-  )
-
-colnames(quality_of_surveillance_export) <- c(
-  lang_label("table_admin1_name"),
-  lang_label("table_admin2_name"),
-  lang_label("total_pr"),
-  lang_label("surveillance_title_map_reporting_units"),
-  lang_label("surveillance_reporting_units_score"),
-  lang_label("surveillance_pfa_rate"),
-  lang_label("surveillance_pfa_rate_score"),
-  lang_label("surveillance_title_map_pfa_notification"),
-  lang_label("surveillance_pfa_notification_score"),
-  lang_label("surveillance_title_map_pfa_investigated"),
-  lang_label("surveillance_pfa_investigated_score"),
-  lang_label("surveillance_title_map_suitable_samples"),
-  lang_label("surveillance_suitable_samples_score"),
-  lang_label("surveillance_title_map_followups"),
-  lang_label("surveillance_followups_score"),
-  lang_label("surveillance_title_map_active_search"),
-  lang_label("surveillance_active_search_score"),
-  lang_label("risk_level")
-)
-
-rio::export(
-  list(
-    general_risk = general_risk_export,
-    population_immunity = population_immunity_export,
-    quality_of_surveillance = quality_of_surveillance_export
-  ),
-  file.path(PATH_global,"Data","polio_results.xlsx")
-)
-
 
 
 
