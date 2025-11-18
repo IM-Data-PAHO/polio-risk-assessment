@@ -180,7 +180,9 @@ report_has_errors <- F
 ```
 
 \newpage
+
 # `r lang_label("title_rev_shp")`
+
 ```{r rev_shapefiles, echo=F, out.width="100%"}
 fig_map = leaflet(country_shapefiles) %>%
   addPolygons(fillColor = "#079992",fillOpacity = .9,
@@ -224,21 +226,25 @@ if (ERROR_LIST == "") {
 }
 ```
 
-
 #### `r lang_label("title_errors_found")`:
 
 `r ERROR_LIST`
 
-#### `r lang_label("title_na_rows")`^[`r lang_label("footnote_na")`].
+#### `r lang_label("title_na_rows")`[^1].
+
+[^1]: `r lang_label("footnote_na")`
+
 ```{r res_rev_shapefiles_na, echo=F}
 na_rows_df <- as.data.frame(country_shapefiles) %>% select(-geometry)
 cat_na_table(na_rows_df,in_cols=NULL)
 ```
 
 \newpage
+
 # `r lang_label("title_rev_country_data")`
 
 ### 1. `r lang_label("title_cdata_general")`
+
 ```{r rev_data_1, echo=F}
 data_sheet_1 <- read_excel(PATH_country_data,sheet = 1)
 colnames(data_sheet_1) <- c("VAR","VAL")
@@ -278,7 +284,9 @@ if (ERROR_LIST == "") {
 `r ERROR_LIST`
 
 \newpage
+
 ### 2. `r lang_label("title_cdata_pob_area")`
+
 ```{r rev_data_2, echo=F}
 data_sheet_2 <- read_excel(PATH_country_data,sheet = 2)
 row_offset <- 1
@@ -311,28 +319,35 @@ colnames(data_sheet_2)[1] = lang_label("row")
 ```
 
 #### `r lang_label("title_na_vars")`.
+
 ```{r, echo=F}
 if (sum(dat_test_na_df2[3]) > 0) {report_has_errors <- T}
 knitr::kable(dat_test_na_df2,align = "lrrrrrr", booktabs = T)
 ```
-- `r text_na_admin1_id`
-- `r text_na_admin1`
 
-#### `r lang_label("title_na_rows")`^[`r lang_label("footnote_na")`].
+-   `r text_na_admin1_id`
+-   `r text_na_admin1`
+
+#### `r lang_label("title_na_rows")`[^2].
+
+[^2]: `r lang_label("footnote_na")`
+
 ```{r, echo=F}
 na_table <- data_sheet_2
 cat_na_table(na_table,in_cols=c(3,5,6,7, 8))
 ```
 
-
 #### `r lang_label("title_invalid_geocode")`.
+
 ```{r, echo=F}
 if (has_invalid_geoid(data_sheet_2) != "") {report_has_errors <- T}
 cat_invalid_geoid_table(data_sheet_2)
 ```
+
 `r has_invalid_geoid(data_sheet_2)`
 
 #### `r lang_label("cdata_error_non_numeric_plural")` '`r colnames(data_sheet_2)[6]`'.
+
 ```{r, echo=F}
 test_table <- data_sheet_2[badrows_num_pob1,]
 test_table <- test_table %>% select(c(1,2,3,6))
@@ -346,6 +361,7 @@ knitr::kable(test_table, booktabs = T)
 ```
 
 #### `r lang_label("cdata_error_non_numeric_plural")` '`r colnames(data_sheet_2)[7]`'.
+
 ```{r, echo=F}
 test_table <- data_sheet_2[badrows_num_pob5,]
 test_table <- test_table %>% select(c(1,2,3,7))
@@ -359,6 +375,7 @@ knitr::kable(test_table, booktabs = T)
 ```
 
 #### `r lang_label("cdata_error_non_numeric_plural")` '`r colnames(data_sheet_2)[8]`'.
+
 ```{r, echo=F}
 test_table <- data_sheet_2[badrows_num_pob15,]
 test_table <- test_table %>% select(c(1,2,3,8))
@@ -372,6 +389,7 @@ knitr::kable(test_table, booktabs = T)
 ```
 
 #### `r lang_label("cdata_error_non_numeric_plural")` '`r colnames(data_sheet_2)[9]`'.
+
 ```{r, echo=F}
 test_table <- data_sheet_2[badrows_num_pob,]
 test_table <- test_table %>% select(c(1,2,3,9))
@@ -385,7 +403,9 @@ knitr::kable(test_table, booktabs = T)
 ```
 
 \newpage
+
 ### 3. `r lang_label("title_cdata_inm")`
+
 ```{r rev_data_3, echo=F}
 YEAR_EVAL <- as.integer(data_sheet_1$VAL[2])
 YEAR_1 = YEAR_EVAL - 5
@@ -452,27 +472,35 @@ colnames(data_sheet_3)[1] = lang_label("row")
 ```
 
 #### `r lang_label("title_na_vars")`.
+
 ```{r, echo=F}
 if (sum(dat_test_na_df3[3]) > 0) {report_has_errors <- T}
 knitr::kable(dat_test_na_df3,align = "lrrrrrr", booktabs = T)
 ```
-- `r text_na_admin1_id`
-- `r text_na_admin1`
 
-#### `r lang_label("title_missing_id")`^[`r lang_label("footnote_na")`].
+-   `r text_na_admin1_id`
+-   `r text_na_admin1`
+
+#### `r lang_label("title_missing_id")`[^3].
+
+[^3]: `r lang_label("footnote_na")`
+
 ```{r, echo=F}
 na_table <- data_sheet_3 %>% select(c(1:5))
 cat_na_table(na_table,in_cols=c(3,5))
 ```
 
 #### `r lang_label("title_invalid_geocode")`.
+
 ```{r, echo=F}
 if (has_invalid_geoid(data_sheet_3) != "") {report_has_errors <- T}
 cat_invalid_geoid_table(data_sheet_3)
 ```
+
 `r has_invalid_geoid(data_sheet_3)`
 
 #### `r lang_label("res_rap_invalid_yesno")` '`r lang_label("immunity_populations_and_pfa")`'.
+
 ```{r, echo=F}
 test_table <- data_sheet_3[badrows_num_population_and_pfa,]
 test_table <- test_table %>% select(c(1,2,3,9))
@@ -486,6 +514,7 @@ knitr::kable(test_table, booktabs = T)
 ```
 
 #### `r lang_label("no_na_nonnum_data")` (`r lang_label("immunity_polio_coverage")`)
+
 ```{r, echo=F}
 idx <- c(10:14)
 temp_data_sheet_3 <- data_sheet_3
@@ -512,6 +541,7 @@ knitr::kable(test_table, booktabs = T)
 ```
 
 #### `r lang_label("no_na_nonnum_data")` (`r lang_label("immunity_ipv_coverage")`)
+
 ```{r, echo=F}
 idx <- c(15)
 temp_data_sheet_3 <- data_sheet_3
@@ -538,6 +568,7 @@ knitr::kable(test_table, booktabs = T)
 ```
 
 #### `r lang_label("res_rap_invalid_yesno")` '`r lang_label("immunity_effective_cob")`'.
+
 ```{r, echo=F}
 test_table <- data_sheet_3[badrows_num_effective_cob,]
 test_table <- test_table %>% select(c(1,2,3,16))
@@ -550,8 +581,8 @@ if (nrow(test_table) == 0) {
 knitr::kable(test_table, booktabs = T)
 ```
 
-
 \newpage
+
 ### 4. `r lang_label("title_surveillance")`
 
 ```{r rev_data_4, echo=F}
@@ -644,14 +675,17 @@ colnames(data_sheet_4)[1] = lang_label("row")
 ```
 
 #### `r lang_label("title_na_vars")`.
+
 ```{r, echo=F}
 if (sum(dat_test_na_df4[3]) > 0) {report_has_errors <- T}
 knitr::kable(dat_test_na_df4,align = "lrrrrrr", booktabs = T)
 ```
-- `r text_na_admin1_id`
-- `r text_na_admin1`
+
+-   `r text_na_admin1_id`
+-   `r text_na_admin1`
 
 #### `r lang_label("no_na_nonnum_data")` (`r lang_label("surveillance_reporting_units_var")`)
+
 ```{r, echo=F}
 idx <- c(10)
 temp_data_sheet_4 <- data_sheet_4
@@ -677,8 +711,8 @@ if (nrow(test_table) == 0) {
 knitr::kable(test_table, booktabs = T)
 ```
 
-
 #### `r lang_label("no_na_nonnum_data")` (`r lang_label("surveillance_pfa_rate_var")`)
+
 ```{r, echo=F}
 idx <- c(11)
 temp_data_sheet_4 <- data_sheet_4
@@ -706,8 +740,8 @@ if (nrow(test_table) == 0) {
 knitr::kable(test_table, booktabs = T)
 ```
 
-
 #### `r lang_label("no_na_nonnum_data")` (`r lang_label("surveillance_pfa_notified_var")`)
+
 ```{r, echo=F}
 idx <- c(12)
 temp_data_sheet_4 <- data_sheet_4
@@ -735,8 +769,8 @@ if (nrow(test_table) == 0) {
 knitr::kable(test_table, booktabs = T)
 ```
 
-
 #### `r lang_label("no_na_nonnum_data")` (`r lang_label("surveillance_pfa_investigated_var")`)
+
 ```{r, echo=F}
 idx <- c(13)
 temp_data_sheet_4 <- data_sheet_4
@@ -764,8 +798,8 @@ if (nrow(test_table) == 0) {
 knitr::kable(test_table, booktabs = T)
 ```
 
-
 #### `r lang_label("no_na_nonnum_data")` (`r lang_label("surveillance_suitable_samples_var")`)
+
 ```{r, echo=F}
 idx <- c(14)
 temp_data_sheet_4 <- data_sheet_4
@@ -794,6 +828,7 @@ knitr::kable(test_table, booktabs = T)
 ```
 
 #### `r lang_label("no_na_nonnum_data")` (`r lang_label("surveillance_followups_var")`)
+
 ```{r, echo=F}
 idx <- c(15)
 temp_data_sheet_4 <- data_sheet_4
@@ -822,6 +857,7 @@ knitr::kable(test_table, booktabs = T)
 ```
 
 #### `r lang_label("res_rap_invalid_yesno")` '`r lang_label("surveillance_active_search_var")`'.
+
 ```{r, echo=F}
 test_table <- data_sheet_4[badrows_num_active_search,]
 test_table <- test_table %>% select(c(1,2,3,16))
@@ -835,6 +871,7 @@ knitr::kable(test_table, booktabs = T)
 ```
 
 \newpage
+
 ### 5. `r lang_label("title_determinants")`
 
 ```{r rev_data_5, echo=F}
@@ -886,15 +923,17 @@ colnames(data_sheet_5)[1] = lang_label("row")
 ```
 
 #### `r lang_label("title_na_vars")`.
+
 ```{r, echo=F}
 if (sum(dat_test_na_df5[3]) > 0) {report_has_errors <- T}
 knitr::kable(dat_test_na_df5,align = "lrrrrrr", booktabs = T)
 ```
 
-- `r text_na_admin1_id`
-- `r text_na_admin1`
+-   `r text_na_admin1_id`
+-   `r text_na_admin1`
 
 #### `r lang_label("no_na_nonnum_data")` (`r lang_label("determinants_water_var")`)
+
 ```{r, echo=F}
 idx <- c(10)
 temp_data_sheet_5 <- data_sheet_5
@@ -921,6 +960,7 @@ knitr::kable(test_table, booktabs = T)
 ```
 
 #### `r lang_label("no_na_nonnum_data")` (`r lang_label("determinants_sanitation_var")`)
+
 ```{r, echo=F}
 idx <- c(11)
 temp_data_sheet_5 <- data_sheet_5
@@ -946,8 +986,8 @@ if (nrow(test_table) == 0) {
 knitr::kable(test_table, booktabs = T)
 ```
 
-
 \newpage
+
 ### 6. `r lang_label("title_outbreaks")`
 
 ```{r rev_data_6, echo=F}
@@ -1015,14 +1055,17 @@ colnames(data_sheet_6)[1] = lang_label("row")
 ```
 
 #### `r lang_label("title_na_vars")`.
+
 ```{r, echo=F}
 if (sum(dat_test_na_df6[3]) > 0) {report_has_errors <- T}
 knitr::kable(dat_test_na_df6,align = "lrrrrrr", booktabs = T)
 ```
-- `r text_na_admin1_id`
-- `r text_na_admin1`
+
+-   `r text_na_admin1_id`
+-   `r text_na_admin1`
 
 #### `r lang_label("res_rap_invalid_yesno")` '`r lang_label("outbreaks_polio")`'.
+
 ```{r, echo=F}
 test_table <- data_sheet_6[badrows_num_polio,]
 test_table <- test_table %>% select(c(1,2,3,10))
@@ -1036,6 +1079,7 @@ knitr::kable(test_table, booktabs = T)
 ```
 
 #### `r lang_label("res_rap_invalid_yesno")` '`r lang_label("outbreaks_measles")`'.
+
 ```{r, echo=F}
 test_table <- data_sheet_6[badrows_num_measles,]
 test_table <- test_table %>% select(c(1,2,3,11))
@@ -1049,6 +1093,7 @@ knitr::kable(test_table, booktabs = T)
 ```
 
 #### `r lang_label("res_rap_invalid_yesno")` '`r lang_label("outbreaks_rubella")`'.
+
 ```{r, echo=F}
 test_table <- data_sheet_6[badrows_num_rubella,]
 test_table <- test_table %>% select(c(1,2,3,12))
@@ -1062,6 +1107,7 @@ knitr::kable(test_table, booktabs = T)
 ```
 
 #### `r lang_label("res_rap_invalid_yesno")` '`r lang_label("outbreaks_diphtheria")`'.
+
 ```{r, echo=F}
 test_table <- data_sheet_6[badrows_num_diphtheria,]
 test_table <- test_table %>% select(c(1,2,3,13))
@@ -1075,6 +1121,7 @@ knitr::kable(test_table, booktabs = T)
 ```
 
 #### `r lang_label("res_rap_invalid_yesno")` '`r lang_label("outbreaks_yellow_fever")`'.
+
 ```{r, echo=F}
 test_table <- data_sheet_6[badrows_num_yellow_fever,]
 test_table <- test_table %>% select(c(1,2,3,14))
@@ -1088,6 +1135,7 @@ knitr::kable(test_table, booktabs = T)
 ```
 
 #### `r lang_label("res_rap_invalid_yesno")` '`r lang_label("outbreaks_tetanus")`'.
+
 ```{r, echo=F}
 test_table <- data_sheet_6[badrows_num_tetanus,]
 test_table <- test_table %>% select(c(1,2,3,15))
