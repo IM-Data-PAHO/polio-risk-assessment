@@ -64,6 +64,7 @@ if (report_has_errors) {
 write_xlsx(LANG_TLS,"R/Modals/qarm_lang.xlsx")
 
 # Modal ----
+
 shiny::runApp("R/Modals/qa_modal.R")
 
 
