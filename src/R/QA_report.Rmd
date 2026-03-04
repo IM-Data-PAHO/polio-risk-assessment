@@ -151,7 +151,7 @@ has_invalid_geoid <- function(data_df) {
 
 population_and_pfa <- function(population_inmunity_df) {
     score <- case_when(
-      population_inmunity_df["POB15"] >= 100000 | population_inmunity_df[lang_label("immunity_populations_and_pfa")] == lang_label("yes") ~ TRUE,
+      population_inmunity_df[["POB15"]] >= 100000 | population_inmunity_df[[lang_label("immunity_populations_and_pfa")]] == lang_label("yes") ~ TRUE,
       TRUE ~ FALSE
     )
     return(score)
